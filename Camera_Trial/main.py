@@ -1,6 +1,5 @@
 from flask import Flask, render_template, Response
 from camera import VideoCamera
-import cv2
 
 app = Flask(__name__, template_folder='C:\\Users\\donal_doherty\\source\\repos\\Camera_Trial\\Camera_Trial\\')
 
@@ -20,4 +19,4 @@ def video_feed():
                     mimetype='multipart/x-mixed-replace; boundary=frame')
 
 if __name__ == '__main__':
-    app.run(host='localhost', debug=True)
+    app.run(host='192.168.0.171', debug=True)
