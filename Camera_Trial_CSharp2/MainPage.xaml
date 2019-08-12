@@ -7,8 +7,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
-
-    <Grid>
-
+    <Grid Margin="0,0,0,10" VerticalAlignment="Stretch">
+        <CaptureElement x:Name="PreviewControl" HorizontalAlignment="Center" VerticalAlignment="Center" Height="324" Margin="0,0,0,0" Width="887"/>
     </Grid>
 </Page>
