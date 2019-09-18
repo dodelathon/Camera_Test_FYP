@@ -7,6 +7,8 @@ Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "Camera_Trial", "Camera_Tria
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Camera_Trial_CSharp2", "Camera_Trial_CSharp2\Camera_Trial_CSharp2.csproj", "{EE9BE682-0940-4D41-BA65-E0A8653CD560}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "C_Sharp_AspDotNet_CameraTest", "C_Sharp_AspDotNet_CameraTest\C_Sharp_AspDotNet_CameraTest.csproj", "{AA0654CB-5DDB-43B0-BA29-46A5E3863103}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -57,6 +59,26 @@ Global
 		{EE9BE682-0940-4D41-BA65-E0A8653CD560}.Release|x86.ActiveCfg = Release|x86
 		{EE9BE682-0940-4D41-BA65-E0A8653CD560}.Release|x86.Build.0 = Release|x86
 		{EE9BE682-0940-4D41-BA65-E0A8653CD560}.Release|x86.Deploy.0 = Release|x86
+		{AA0654CB-5DDB-43B0-BA29-46A5E3863103}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AA0654CB-5DDB-43B0-BA29-46A5E3863103}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AA0654CB-5DDB-43B0-BA29-46A5E3863103}.Debug|ARM.ActiveCfg = Debug|Any CPU
+		{AA0654CB-5DDB-43B0-BA29-46A5E3863103}.Debug|ARM.Build.0 = Debug|Any CPU
+		{AA0654CB-5DDB-43B0-BA29-46A5E3863103}.Debug|ARM64.ActiveCfg = Debug|Any CPU
+		{AA0654CB-5DDB-43B0-BA29-46A5E3863103}.Debug|ARM64.Build.0 = Debug|Any CPU
+		{AA0654CB-5DDB-43B0-BA29-46A5E3863103}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{AA0654CB-5DDB-43B0-BA29-46A5E3863103}.Debug|x64.Build.0 = Debug|Any CPU
+		{AA0654CB-5DDB-43B0-BA29-46A5E3863103}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{AA0654CB-5DDB-43B0-BA29-46A5E3863103}.Debug|x86.Build.0 = Debug|Any CPU
+		{AA0654CB-5DDB-43B0-BA29-46A5E3863103}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AA0654CB-5DDB-43B0-BA29-46A5E3863103}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AA0654CB-5DDB-43B0-BA29-46A5E3863103}.Release|ARM.ActiveCfg = Release|Any CPU
+		{AA0654CB-5DDB-43B0-BA29-46A5E3863103}.Release|ARM.Build.0 = Release|Any CPU
+		{AA0654CB-5DDB-43B0-BA29-46A5E3863103}.Release|ARM64.ActiveCfg = Release|Any CPU
+		{AA0654CB-5DDB-43B0-BA29-46A5E3863103}.Release|ARM64.Build.0 = Release|Any CPU
+		{AA0654CB-5DDB-43B0-BA29-46A5E3863103}.Release|x64.ActiveCfg = Release|Any CPU
+		{AA0654CB-5DDB-43B0-BA29-46A5E3863103}.Release|x64.Build.0 = Release|Any CPU
+		{AA0654CB-5DDB-43B0-BA29-46A5E3863103}.Release|x86.ActiveCfg = Release|Any CPU
+		{AA0654CB-5DDB-43B0-BA29-46A5E3863103}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
