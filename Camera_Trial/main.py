@@ -1,7 +1,7 @@
-from flask import Flask, render_template, Response
+from Flask import Flask, render_template, Response
 from camera import VideoCamera
 
-app = Flask(__name__, template_folder='C:\\Users\\donal_doherty\\source\\repos\\Camera_Trial\\Camera_Trial\\')
+app = Flask(__name__, template_folder='C:\\Users\\donal\\source\\repos\\Camera_Trial\\Camera_Trial\\')
 
 @app.route('/')
 def index():
