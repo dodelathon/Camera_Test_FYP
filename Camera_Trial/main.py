@@ -1,22 +1,16 @@
-from Flask import Flask, render_template, Response
 from camera import VideoCamera
 
-app = Flask(__name__, template_folder='C:\\Users\\donal\\source\\repos\\Camera_Trial\\Camera_Trial\\')
+frameRate = cap.get(5) #frame rate
+x=1
+while(cap.isOpened()):
+    frameId = cap.get(1) #current frame number
+    ret, frame = cap.read()
+    if (ret != True):
+        break
+    if (frameId % math.floor(frameRate) == 0):
+        filename = './test_images/image' +  str(int(x)) + ".jpg";x+=1
+        cv2.imwrite(filename, frame)
 
-@app.route('/')
-def index():
-    return render_template('index.html')
+cap.release()
+print ("Done!")
 
-def gen(camera):
-    while True:
-        frame = camera.get_frame()
-        yield (b'--frame\r\n'
-               b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n\r\n')
-
-@app.route('/video_feed')
-def video_feed():
-    return Response(gen(VideoCamera()),
-                    mimetype='multipart/x-mixed-replace; boundary=frame')
-
-if __name__ == '__main__':
-    app.run(host='192.168.0.171', debug=True)
