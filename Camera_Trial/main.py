@@ -11,7 +11,7 @@ while(cap.isOpened()):
     ret, frame = cap.read()
     if (ret != True):
         break
-    if(counter == 30):
+    if(counter == 150):
         filename = 'D:\\Desktop\\cam_folder\\image.jpg'
         x += 1
         cv2.imwrite(filename, frame)
