@@ -2,7 +2,7 @@ import math
 import cv2
 import requests
 
-url = "https://donal-doherty.com/api/image"
+url = "https://donal-doherty.com/api/image/Upload"
 cap = cv2.VideoCapture(0)
 x=1
 counter = 0
