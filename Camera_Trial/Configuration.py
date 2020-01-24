@@ -10,6 +10,10 @@ def settingsWriter():
     global _SETTINGS_FILE
     domain = input("Enter the domain: ")
     _SETTINGS_FILE.write("Domain: " + domain + "\n")
+    ImageAPI = input("Enter the Image Upload API Path: ")
+    _SETTINGS_FILE.write("ImageAPI: " + ImageAPI + "\n")
+    StatsAPI = input("Enter the Stats Upload API Path : ")
+    _SETTINGS_FILE.write("StatsAPI: " + StatsAPI + "\n")
     deviceName = platform.uname()[1]
     _SETTINGS_FILE.write("DeviceName: " + deviceName + "\n")
     _SETTINGS_FILE.close()
