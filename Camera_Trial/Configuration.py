@@ -19,7 +19,9 @@ def settingsWriter():
         Octoprint = input("Enter the Domain/IP Address of the Raspberry Pi running OctoPrint: ")
         _SETTINGS_FILE.write("OctoPiAddress; " + Octoprint + "\n")
         Octoprint_API = input("Enter the Octoprint API Key: ")
-        _SETTINGS_FILE.write("OctoPiAddress; " + Octoprint_API + "\n")
+        _SETTINGS_FILE.write("OctoPiKey; " + Octoprint_API + "\n")
+        Arduino_Baudrate = input("Enter the Arduino Baudrate: ")
+        _SETTINGS_FILE.write("ArduinoBaudrate; " + Arduino_Baudrate + "\n")
         deviceName = platform.uname()[1]
         _SETTINGS_FILE.write("DeviceName; " + deviceName + "\n")
 

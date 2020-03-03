@@ -1,3 +1,4 @@
+#Imports
 import math
 import cv2
 import requests
@@ -8,7 +9,7 @@ import serial.tools.list_ports
 import os
 import timeit as time
 
-
+#Initialization of Global Variables
 _OPERATING_SYSTEM = None
 _SETTING_FILE_PATH = ""
 _SETTINGS_FILE = None
@@ -18,6 +19,8 @@ _S_PORT = None
 _FOUND = False
 _PROBLEM_DETECTED = False
 
+
+#Determines the platform the Code is running on. 
 if sys.platform.startswith('linux'):
     _OPERATING_SYSTEM = 1
 elif sys.platform.startswith('win32'):
@@ -35,6 +38,7 @@ if _OPERATING_SYSTEM == 1:
 elif _OPERATING_SYSTEM == 2:
      _SETTING_FILE_PATH = "C:\\Camera_Script_Setup\\"
 
+#Open the configuration and then reads in the settings.
 if os.path.exists(_SETTING_FILE_PATH):
         _SETTING_FILE_PATH += "setup.ini"
         if os.path.exists(_SETTING_FILE_PATH):
@@ -44,21 +48,26 @@ if os.path.exists(_SETTING_FILE_PATH):
                 _ATTRIBUTE_LIST[kv[0]] = kv[1]
                 print(kv[0] + " : " + kv[1])
             lines.close()
-     
+#This portion detects connected serial devices and searches for an attached arduino     
 ports = list(serial.tools.list_ports.comports())
 for p in ports:
     if "Arduino" in p[1]:
         _ARDUINO = p
         _FOUND = True
         print("Arduino Found, using the first!")
-if _FOUND == False:
-    print("Arduino not connected to the system, exiting...")
-else:
-    _S_PORT = serial.serial_for_url(_ARDUINO[0], baudrate=57600, timeout=0)
+
+#If and arduino is found, a connection is initiated.
+if _FOUND != False:
+    _S_PORT = serial.serial_for_url(_ARDUINO[0], baudrate=_ATTRIBUTE_LIST['ArduinoBaudrate'], timeout=0)
     sio = io.TextIOWrapper(io.BufferedRWPair(_S_PORT, _S_PORT))
     Time = time.default_timer()
     ProblemTime = time.default_timer()
-    while True:
+
+#The main funtionality of this script is here. 
+while True:
+
+    #This section only activates if an arduino is connected. It checks to see if the rotor in the head has moved. If not, signals there's been a problem with the print
+    if _FOUND != False:
         sio.flush()
         input = sio.readline()
         ProblemTime = time.default_timer()
@@ -67,4 +76,4 @@ else:
             _PROBLEM_DETECTED = False
             print(input)
         if(ProblemTime - Time) > 10 and _PROBLEM_DETECTED == False:
-            _PROBLEM_DETECTED = True
+                _PROBLEM_DETECTED = True
