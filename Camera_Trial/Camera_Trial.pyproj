@@ -4,7 +4,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>4ceb5d54-09cb-4a47-af85-15e422108f56</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>Configuration.py</StartupFile>
+    <StartupFile>Information_Sender_Script.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
@@ -22,6 +22,9 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="FileReadTest.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Information_Sender_Script.py">
       <SubType>Code</SubType>
     </Compile>

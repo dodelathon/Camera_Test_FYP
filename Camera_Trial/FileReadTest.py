@@ -5,18 +5,14 @@ import sys
 import io
 import serial
 import serial.tools.list_ports
-import os
-import timeit as time
 
 
-_OPERATING_SYSTEM = None
+_OPERATING_SYSTEM = 0
 _SETTING_FILE_PATH = ""
-_SETTINGS_FILE = None
+_SETTINGS_FILE = 0
 _ATTRIBUTE_LIST = {}
-_ARDUINO = None
-_S_PORT = None
-_FOUND = False
-_PROBLEM_DETECTED = False
+_ARDUINO = 0
+_S_PORT = 0
 
 if sys.platform.startswith('linux'):
     _OPERATING_SYSTEM = 1
@@ -43,28 +39,16 @@ if os.path.exists(_SETTING_FILE_PATH):
                 kv = x.split("; ")
                 _ATTRIBUTE_LIST[kv[0]] = kv[1]
                 print(kv[0] + " : " + kv[1])
-            lines.close()
      
 ports = list(serial.tools.list_ports.comports())
 for p in ports:
     if "Arduino" in p[1]:
         _ARDUINO = p
-        _FOUND = True
-        print("Arduino Found, using the first!")
-if _FOUND == False:
-    print("Arduino not connected to the system, exiting...")
-else:
-    _S_PORT = serial.serial_for_url(_ARDUINO[0], baudrate=57600, timeout=0)
+if _ARDUINO != 0:
+    _S_PORT = serial.serial_for_url(_ARDUINO[0], timeout=1)
     sio = io.TextIOWrapper(io.BufferedRWPair(_S_PORT, _S_PORT))
-    Time = time.default_timer()
-    ProblemTime = time.default_timer()
     while True:
         sio.flush()
-        input = sio.readline()
-        ProblemTime = time.default_timer()
-        if input != "" :
-            Time = time.default_timer()
-            _PROBLEM_DETECTED = False
-            print(input)
-        if(ProblemTime - Time) > 10 and _PROBLEM_DETECTED == False:
-            _PROBLEM_DETECTED = True
+        print(sio.readline())
+else:
+    print("Arduino not connected to the system, exiting...")
