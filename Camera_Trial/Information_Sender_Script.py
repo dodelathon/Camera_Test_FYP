@@ -42,11 +42,12 @@ elif _OPERATING_SYSTEM == 2:
 if os.path.exists(_SETTING_FILE_PATH):
         _SETTING_FILE_PATH += "setup.ini"
         if os.path.exists(_SETTING_FILE_PATH):
-            lines = open(_SETTING_FILE_PATH)
+            lines = open(_SETTING_FILE_PATH).read().split('\n')
             for x in lines:
-                kv = x.split("; ")
-                _ATTRIBUTE_LIST[kv[0]] = kv[1]
-                print(kv[0] + " : " + kv[1])
+                if x != "":
+                    kv = x.split("; ")
+                    _ATTRIBUTE_LIST[kv[0]] = kv[1]
+                    print(kv[0] + " : " + kv[1])
             lines.close()
 #This portion detects connected serial devices and searches for an attached arduino     
 ports = list(serial.tools.list_ports.comports())

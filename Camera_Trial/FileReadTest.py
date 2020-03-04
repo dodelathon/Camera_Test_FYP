@@ -3,6 +3,7 @@ import cv2
 import requests
 import sys
 import io
+import os
 import serial
 import serial.tools.list_ports
 
@@ -34,21 +35,16 @@ elif _OPERATING_SYSTEM == 2:
 if os.path.exists(_SETTING_FILE_PATH):
         _SETTING_FILE_PATH += "setup.ini"
         if os.path.exists(_SETTING_FILE_PATH):
-            lines = open(_SETTING_FILE_PATH)
+            lines = open(_SETTING_FILE_PATH).read().split('\n')
             for x in lines:
-                kv = x.split("; ")
-                _ATTRIBUTE_LIST[kv[0]] = kv[1]
-                print(kv[0] + " : " + kv[1])
+                if x != "":
+                    kv = x.split("; ")
+                    _ATTRIBUTE_LIST[kv[0]] = kv[1]
+                    print(kv[0] + " : " + kv[1])
      
-ports = list(serial.tools.list_ports.comports())
-for p in ports:
-    if "Arduino" in p[1]:
-        _ARDUINO = p
-if _ARDUINO != 0:
-    _S_PORT = serial.serial_for_url(_ARDUINO[0], timeout=1)
-    sio = io.TextIOWrapper(io.BufferedRWPair(_S_PORT, _S_PORT))
-    while True:
-        sio.flush()
-        print(sio.readline())
-else:
-    print("Arduino not connected to the system, exiting...")
+RegAPI = _ATTRIBUTE_LIST['OctoPiAddress'] + "api/printer"
+print(RegAPI)
+print(_ATTRIBUTE_LIST['OctoPiKey'])
+headers = {'X-Api-Key':_ATTRIBUTE_LIST['OctoPiKey']}
+resp = requests.request("GET", RegAPI, headers=headers)
+print(resp.text)
