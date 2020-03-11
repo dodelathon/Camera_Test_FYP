@@ -4,7 +4,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>4ceb5d54-09cb-4a47-af85-15e422108f56</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>FileReadTest.py</StartupFile>
+    <StartupFile>Configuration.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
@@ -32,6 +32,9 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Configuration.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ParseJsonTrial.py">
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>

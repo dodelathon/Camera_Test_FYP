@@ -57,7 +57,7 @@ try:
             filename = _ATTRIBUTE_LIST["ImagePath"] + "image.jpg"     
             x += 1
             cv2.imwrite(filename, frame)
-            files = {'photo' : ('image.jpg', open(filename, 'rb')), '_DeviceName': _ATTRIBUTE_LIST["DeviceName"]}
+            files = {'photo' : ('image.jpg', open(filename, 'rb')), '_Device': _ATTRIBUTE_LIST["DeviceUUID"]}
             r = requests.post(url, files=files)
             print(r.text)
             counter = 0
