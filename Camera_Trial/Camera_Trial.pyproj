@@ -4,7 +4,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>4ceb5d54-09cb-4a47-af85-15e422108f56</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>Configuration.py</StartupFile>
+    <StartupFile>ParseJsonTrial.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>

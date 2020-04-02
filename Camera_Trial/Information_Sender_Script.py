@@ -8,6 +8,7 @@ import serial
 import serial.tools.list_ports
 import os
 import timeit as time
+import json
 
 #Initialization of Global Variables
 _OPERATING_SYSTEM = None
@@ -64,6 +65,11 @@ if _FOUND != False:
     Time = time.default_timer()
     ProblemTime = time.default_timer()
 
+OctoAPI = _ATTRIBUTE_LIST["OctoPiAddress"]
+OctoHeaders = {'X-Api-Key': _ATTRIBUTE_LIST["OctoPiKey"]}
+StatsAPI = _ATTRIBUTE_LIST["Domain"] + "api/DeviceData/GetStats"
+StatsHeaders = {"Device": _ATTRIBUTE_LIST["DeviceUUID"]}
+
 #The main funtionality of this script is here. 
 while True:
 
@@ -78,3 +84,16 @@ while True:
             print(input)
         if(ProblemTime - Time) > 10 and _PROBLEM_DETECTED == False:
                 _PROBLEM_DETECTED = True
+    resp = ""
+    jsonFile = open("Stats.json", "w+")
+    try:
+        resp = requests.get(OctoAPI, headers = OctoHeaders)
+        jsonFile.write(resp.text)
+    except:
+        if jsonFile.closed() == False:
+            jsonFile.close()
+        print("There was an issue sending the request!")
+
+
+
+
