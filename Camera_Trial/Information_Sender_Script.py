@@ -19,6 +19,8 @@ _ARDUINO = None
 _S_PORT = None
 _FOUND = False
 _PROBLEM_DETECTED = False
+Time = 0
+ProblemTime = 0
 
 
 #Determines the platform the Code is running on. 
@@ -67,33 +69,78 @@ if _FOUND != False:
 
 OctoAPI = _ATTRIBUTE_LIST["OctoPiAddress"]
 OctoHeaders = {'X-Api-Key': _ATTRIBUTE_LIST["OctoPiKey"]}
-StatsAPI = _ATTRIBUTE_LIST["Domain"] + "api/DeviceData/GetStats"
+StatsAPI = _ATTRIBUTE_LIST["Domain"] + "api/DeviceData/UpdateDeviceStats"
 StatsHeaders = {"Device": _ATTRIBUTE_LIST["DeviceUUID"]}
 
+main()
+
+end = False
+while end == False:
+    arg = input("There appears to be an issue, Continue? (Y or N)")
+    arg = arg.upper()
+    if arg == "Y":
+        _PROBLEM_DETECTED = False
+        Time = 0
+        ProblemTime = 0
+        main()
+    else:
+        end = True
+
+
 #The main funtionality of this script is here. 
-while True:
+def main():
+    stop = false
+    while stop == false:
 
-    #This section only activates if an arduino is connected. It checks to see if the rotor in the head has moved. If not, signals there's been a problem with the print
-    if _FOUND != False:
-        sio.flush()
-        input = sio.readline()
-        ProblemTime = time.default_timer()
-        if input != "" :
-            Time = time.default_timer()
-            _PROBLEM_DETECTED = False
-            print(input)
-        if(ProblemTime - Time) > 10 and _PROBLEM_DETECTED == False:
+        #This section polls the Octoprint instance connected to the printer (Script will likely be on the same Raspberry PI)
+        resp = ""
+        jsonFile = open("Stats.json", "w+")
+        try:
+            resp = requests.get(OctoAPI + "api/job", headers = OctoHeaders)
+            if(resp.status_code == 409):
+                jsonFile.write("{ \"state\" : \"" + resp.text + "\"}")
+            else:
+                resp = json.loads(resp.text)
+                if _FOUND == True:
+                    resp["state"]["flags"]["ArduinoFound"] = _FOUND
+                    resp["state"]["flags"]["FeedError"] = _PROBLEM_DETECTED
+                    stop = True
+                    try: 
+                        action = {"command":"pause", "action":"pause"}
+                        resp = requests.post(OctoAPI + "api/job", json=action, headers = OctoHeaders)
+                        stop = True
+                    except:
+                        resp["state"]["flags"]["Communication"] = "Error communicating with the printer"
+
+                else:
+                    resp["state"]["flags"]["ArduinoFound"] = _FOUND
+                
+                jsonFile.write(json.dumps(resp))
+        
+        except:
+            if jsonFile.closed() == False:
+                jsonFile.write("{\"Status\" : \"There was an issue sending the request, Octoprint may be offline!\"}")
+                jsonFile.close()
+            print("There was an issue sending the request,\nOctoprint may be offline!")
+            stop = True
+
+        #This section only activates if an arduino is connected. It checks to see if the rotor in the head has moved. If not, signals there's been a problem with the print
+        if _FOUND != False:
+            sio.flush()
+            input = sio.readline()
+            ProblemTime = time.default_timer()
+            if input != "" :
+                Time = time.default_timer()
+                _PROBLEM_DETECTED = False
+                print(input)
+            if(ProblemTime - Time) > 10 and _PROBLEM_DETECTED == False:
                 _PROBLEM_DETECTED = True
-    resp = ""
-    jsonFile = open("Stats.json", "w+")
-    try:
-        resp = requests.get(OctoAPI, headers = OctoHeaders)
-        jsonFile.write(resp.text)
-    except:
-        if jsonFile.closed() == False:
-            jsonFile.close()
-        print("There was an issue sending the request!")
-
+        try:
+            files = {'StatsFile' : ('Stats.json', open("Stats.json", 'rb')), '_Device': _ATTRIBUTE_LIST["DeviceUUID"]}
+            r = requests.post(url, files=files)
+        except:
+            print("There was an error updating the Statistics on the Server!\nIs it offline?")
+ 
 
 
 

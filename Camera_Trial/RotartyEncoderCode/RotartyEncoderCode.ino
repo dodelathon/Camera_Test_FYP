@@ -58,10 +58,6 @@ void loop()
       pos = newPos%28;
     }
 
-    // Just to show, that long lasting procedures don't break the rotary encoder:
-    // When newPos is 66 the ouput will freeze, but the turned positions will be recognized even when not polled.
-    // The interrupt still works.
-    // The output is correct 6.6 seconds later.
     if (newPos == 28 || newPos == -28)
     {
       encoder.setPosition(0);

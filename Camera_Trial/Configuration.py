@@ -12,7 +12,8 @@ _SETTINGS_FILE = 0
 def settingsWriter():
     global _SETTINGS_FILE
     try:
-        domain = input("Enter the API URL/IP Address (Include '/' at the end): ")
+        print(r"(Include '/' at the end of URLs and '/' or '\' to File Paths depending on OS!)")
+        domain = input("Enter the API URL/IP Address: ")
         _SETTINGS_FILE.write("Domain; " + domain + "\n")
         ImagePath = input("Enter the Path to a folder to save Captured Images: ")
         _SETTINGS_FILE.write("ImagePath; " + ImagePath + "\n")
@@ -22,6 +23,10 @@ def settingsWriter():
         _SETTINGS_FILE.write("OctoPiKey; " + Octoprint_API + "\n")
         Arduino_Baudrate = input("Enter the Arduino Baudrate: ")
         _SETTINGS_FILE.write("ArduinoBaudrate; " + Arduino_Baudrate + "\n")
+        ImageCaptureInterval = input("Enter how often to take a picture (In Seconds)!")
+        _SETTINGS_FILE.write("ImageInterval; " + ImageCaptureInterval + "\n")
+        PrinterPollInterval = input("Enter how often to Poll the printer (In Seconds)!")
+        _SETTINGS_FILE.write("PollInterval; " + PrinterPollInterval + "\n") 
         deviceName = platform.uname()[1]
         _SETTINGS_FILE.write("DeviceName; " + deviceName + "\n")
 

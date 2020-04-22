@@ -45,6 +45,7 @@ else:
 
 url = _ATTRIBUTE_LIST["Domain"] + _API_PATH
 cap = cv2.VideoCapture(0)
+Interval = _ATTRIBUTE_LIST["ImageInterval"] * 30
 x=1
 counter = 0
 try:
@@ -53,7 +54,7 @@ try:
         ret, frame = cap.read()
         if (ret != True):
             break
-        if(counter == 150):
+        if(counter == Interval):
             filename = _ATTRIBUTE_LIST["ImagePath"] + "image.jpg"     
             x += 1
             cv2.imwrite(filename, frame)
