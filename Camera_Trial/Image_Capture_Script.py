@@ -3,6 +3,7 @@ import cv2
 import requests
 import sys
 import os
+import time
 
 # Declaration of Global Variables
 
@@ -45,24 +46,22 @@ else:
 
 url = _ATTRIBUTE_LIST["Domain"] + _API_PATH
 cap = cv2.VideoCapture(0)
-Interval = _ATTRIBUTE_LIST["ImageInterval"] * 30
-x=1
-counter = 0
+Interval = _ATTRIBUTE_LIST["ImageInterval"]
+
 try:
     while(cap.isOpened()):
         frameId = cap.get(1)
         ret, frame = cap.read()
         if (ret != True):
             break
-        if(counter == Interval):
-            filename = _ATTRIBUTE_LIST["ImagePath"] + "image.jpg"     
-            x += 1
-            cv2.imwrite(filename, frame)
-            files = {'photo' : ('image.jpg', open(filename, 'rb')), '_Device': _ATTRIBUTE_LIST["DeviceUUID"]}
-            r = requests.post(url, files=files)
-            print(r.text)
-            counter = 0
-        counter += 1
+
+        time.sleep(Interval)
+        filename = _ATTRIBUTE_LIST["ImagePath"] + "image.jpg"     
+        cv2.imwrite(filename, frame)
+        files = {'photo' : ('image.jpg', open(filename, 'rb')), '_Device': _ATTRIBUTE_LIST["DeviceUUID"]}
+        r = requests.post(url, files=files)
+        print(r.text)
+
         cap.release()
 except:
     cap.release()

@@ -7,8 +7,9 @@ import io
 import serial
 import serial.tools.list_ports
 import os
-import timeit as time
+import timeit
 import json
+import time
 
 #Initialization of Global Variables
 _OPERATING_SYSTEM = None
@@ -71,6 +72,72 @@ OctoAPI = _ATTRIBUTE_LIST["OctoPiAddress"]
 OctoHeaders = {'X-Api-Key': _ATTRIBUTE_LIST["OctoPiKey"]}
 StatsAPI = _ATTRIBUTE_LIST["Domain"] + "api/DeviceData/UpdateDeviceStats"
 StatsHeaders = {"Device": _ATTRIBUTE_LIST["DeviceUUID"]}
+Interval = _ATTRIBUTE_LIST["PollInterval"]
+Inactivity_Length = _ATTRIBUTE_LIST["ArduinoInactivityLength"]
+
+#The main funtionality of this script is here. 
+def main():
+    stop = false
+    while stop == false:
+
+        #This section polls the Octoprint instance connected to the printer (Script will likely be on the same Raspberry PI)
+        resp = ""
+        jsonFile = open("Stats.json", "w+")
+        try:
+            resp = requests.get(OctoAPI + "api/printer", headers = OctoHeaders)
+            if(resp.status_code == 409):
+                jsonFile.write("{ \"state\" : \"" + resp.text + "\"}")
+            else:
+                resp = json.loads(resp.text)
+                #If the Arduino is detected, will test if any feed issues have been detected
+                if _FOUND == True:
+                    resp["state"]["flags"]["ArduinoFound"] = _FOUND
+                    resp["state"]["flags"]["FeedError"] = _PROBLEM_DETECTED
+                    stop = _PROBLEM_DETECTED
+                    #Tells the printer to pause the job if the a problem is detected
+                    if _PROBLEM_DETECTED == True:
+                        try: 
+                            action = {"command":"pause", "action":"pause"}
+                            resp = requests.post(OctoAPI + "api/job", json=action, headers = OctoHeaders)
+                        except:
+                            resp["state"]["flags"]["Communication"] = "Error communicating with the printer"
+
+                else:
+                    resp["state"]["flags"]["ArduinoFound"] = _FOUND
+                
+                jsonFile.write(json.dumps(resp))
+        
+        except:
+            #Pauses script if there's an issue communicating to Octoprint
+            if jsonFile.closed() == False:
+                jsonFile.write("{\"Status\" : \"There was an issue sending the request, Octoprint may be offline!\"}")
+                jsonFile.close()
+            print("There was an issue sending the request,\nOctoprint may be offline!")
+            stop = True
+
+        #Checks to see if there is an active job, this stops the script from pausing if theres no movement on the Arduino due to no active job 
+        resp = requests.get(OctoAPI + "api/job", headers = OctoHeaders)    
+        resp = json.loads(resp.text)
+        if resp["job"]["estimatedPrintTime"] is not None:
+            #This section only activates if an arduino is connected. It checks to see if the rotory encoder in the head has moved. If not, signals there's been a problem with the print
+            if _FOUND != False:
+                sio.flush()
+                input = sio.readline()
+                ProblemTime = timeit.default_timer()
+                if input != "" :
+                    Time = timeit.default_timer()
+                    _PROBLEM_DETECTED = False
+                    print(input)
+                if(ProblemTime - Time) > Inactivity_Length and _PROBLEM_DETECTED == False:
+                    _PROBLEM_DETECTED = True
+        
+        #Attempts to send Stats file to the server.
+        try:
+            files = {'StatsFile' : ('Stats.json', open("Stats.json", 'rb')), '_Device': _ATTRIBUTE_LIST["DeviceUUID"]}
+            r = requests.post(url, files=files)
+        except:
+            print("There was an error updating the Statistics on the Server!\nIs it offline?")
+        time.sleep(Interval)
 
 main()
 
@@ -85,62 +152,3 @@ while end == False:
         main()
     else:
         end = True
-
-
-#The main funtionality of this script is here. 
-def main():
-    stop = false
-    while stop == false:
-
-        #This section polls the Octoprint instance connected to the printer (Script will likely be on the same Raspberry PI)
-        resp = ""
-        jsonFile = open("Stats.json", "w+")
-        try:
-            resp = requests.get(OctoAPI + "api/job", headers = OctoHeaders)
-            if(resp.status_code == 409):
-                jsonFile.write("{ \"state\" : \"" + resp.text + "\"}")
-            else:
-                resp = json.loads(resp.text)
-                if _FOUND == True:
-                    resp["state"]["flags"]["ArduinoFound"] = _FOUND
-                    resp["state"]["flags"]["FeedError"] = _PROBLEM_DETECTED
-                    stop = True
-                    try: 
-                        action = {"command":"pause", "action":"pause"}
-                        resp = requests.post(OctoAPI + "api/job", json=action, headers = OctoHeaders)
-                        stop = True
-                    except:
-                        resp["state"]["flags"]["Communication"] = "Error communicating with the printer"
-
-                else:
-                    resp["state"]["flags"]["ArduinoFound"] = _FOUND
-                
-                jsonFile.write(json.dumps(resp))
-        
-        except:
-            if jsonFile.closed() == False:
-                jsonFile.write("{\"Status\" : \"There was an issue sending the request, Octoprint may be offline!\"}")
-                jsonFile.close()
-            print("There was an issue sending the request,\nOctoprint may be offline!")
-            stop = True
-
-        #This section only activates if an arduino is connected. It checks to see if the rotor in the head has moved. If not, signals there's been a problem with the print
-        if _FOUND != False:
-            sio.flush()
-            input = sio.readline()
-            ProblemTime = time.default_timer()
-            if input != "" :
-                Time = time.default_timer()
-                _PROBLEM_DETECTED = False
-                print(input)
-            if(ProblemTime - Time) > 10 and _PROBLEM_DETECTED == False:
-                _PROBLEM_DETECTED = True
-        try:
-            files = {'StatsFile' : ('Stats.json', open("Stats.json", 'rb')), '_Device': _ATTRIBUTE_LIST["DeviceUUID"]}
-            r = requests.post(url, files=files)
-        except:
-            print("There was an error updating the Statistics on the Server!\nIs it offline?")
- 
-
-
-

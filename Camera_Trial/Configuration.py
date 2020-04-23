@@ -27,6 +27,8 @@ def settingsWriter():
         _SETTINGS_FILE.write("ImageInterval; " + ImageCaptureInterval + "\n")
         PrinterPollInterval = input("Enter how often to Poll the printer (In Seconds)!")
         _SETTINGS_FILE.write("PollInterval; " + PrinterPollInterval + "\n") 
+        ArduinoInactivityLength = input("Enter how long the Arduino c\n be inactive for (In Seconds)!")
+        _SETTINGS_FILE.write("ArduinoInactivityLength; " + ArduinoInactivityLength + "\n") 
         deviceName = platform.uname()[1]
         _SETTINGS_FILE.write("DeviceName; " + deviceName + "\n")
 
