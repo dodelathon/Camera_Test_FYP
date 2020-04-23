@@ -53,6 +53,7 @@ if os.path.exists(_SETTING_FILE_PATH):
                     _ATTRIBUTE_LIST[kv[0]] = kv[1]
                     print(kv[0] + " : " + kv[1])
             lines.close()
+
 #This portion detects connected serial devices and searches for an attached arduino     
 ports = list(serial.tools.list_ports.comports())
 for p in ports:
@@ -134,7 +135,7 @@ def main():
         #Attempts to send Stats file to the server.
         try:
             files = {'StatsFile' : ('Stats.json', open("Stats.json", 'rb')), '_Device': _ATTRIBUTE_LIST["DeviceUUID"]}
-            r = requests.post(url, files=files)
+            r = requests.post(url, files=files, headers = StatsHeaders)
         except:
             print("There was an error updating the Statistics on the Server!\nIs it offline?")
         time.sleep(Interval)
@@ -147,8 +148,8 @@ while end == False:
     arg = arg.upper()
     if arg == "Y":
         _PROBLEM_DETECTED = False
-        Time = 0
-        ProblemTime = 0
+        Time = timeit.default_timer()
+        ProblemTime = timeit.default_timer()
         main()
     else:
         end = True

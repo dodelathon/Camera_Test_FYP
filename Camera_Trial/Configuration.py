@@ -38,7 +38,6 @@ def settingsWriter():
         files = 'DevName=' + deviceName
         resp = requests.request("POST", RegAPI, headers=headers, data = files)
         UUID = resp.text
-        print(UUID)
         _SETTINGS_FILE.write("DeviceUUID; " + UUID + "\n")
         print("File Successfully written!")
         input("Press Enter to Exit Program...")
