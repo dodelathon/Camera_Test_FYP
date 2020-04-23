@@ -20,7 +20,7 @@ if sys.platform.startswith('linux'):
 elif sys.platform.startswith('win32'):
     _OPERATING_SYSTEM = 2
 
-if _OPERATING_SYSTEM == 1 or _OP_OPERATING_SYSTEM == 0 :
+if _OPERATING_SYSTEM == 1 or _OPERATING_SYSTEM == 0 :
      _SETTING_FILE_PATH = "~/Camera_Script_Setup/"
 elif _OPERATING_SYSTEM == 2:
      _SETTING_FILE_PATH = "C:\\Camera_Script_Setup\\"
@@ -36,17 +36,19 @@ if os.path.exists(_SETTING_FILE_PATH):
                     kv = x.split("; ")
                     _ATTRIBUTE_LIST[kv[0]] = kv[1]
                     print(kv[0] + " : " + kv[1])
-            lines.close()
 else:
     try:
         print("Configuration File not found, Please run the configuration script and try again!")
         sys.exit(0)    
+    except:
+        print("")
 
 # Sets the API upload URL, Utilizes OpenCV to connect to the camera and sends a frame every 5 seconds to the server.
-
 url = _ATTRIBUTE_LIST["Domain"] + _API_PATH
+print(url)
 cap = cv2.VideoCapture(0)
-Interval = _ATTRIBUTE_LIST["ImageInterval"]
+Interval = int(_ATTRIBUTE_LIST["ImageInterval"])
+header = {'_Device':_ATTRIBUTE_LIST["DeviceUUID"]}
 
 try:
     while(cap.isOpened()):
@@ -55,14 +57,15 @@ try:
         if (ret != True):
             break
 
+        print(_ATTRIBUTE_LIST["DeviceUUID"])
         time.sleep(Interval)
-        filename = _ATTRIBUTE_LIST["ImagePath"] + "image.jpg"     
+        filename = _ATTRIBUTE_LIST["ImagePath"] + "image.jpg"   
         cv2.imwrite(filename, frame)
-        files = {'photo' : ('image.jpg', open(filename, 'rb')), '_Device': _ATTRIBUTE_LIST["DeviceUUID"]}
-        r = requests.post(url, files=files)
+        file = {'photo' : ('image.jpg', open(filename, 'rb'))}
+        r = requests.post(url, files=file, headers=header)
+        print(r.status_code)
         print(r.text)
-
-        cap.release()
+    cap.release()
 except:
     cap.release()
     print("An error has occured during the capture process, closing...")

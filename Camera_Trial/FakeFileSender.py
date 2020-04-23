@@ -52,7 +52,6 @@ if os.path.exists(_SETTING_FILE_PATH):
                     kv = x.split("; ")
                     _ATTRIBUTE_LIST[kv[0]] = kv[1]
                     print(kv[0] + " : " + kv[1])
-            lines.close()
 
 #This portion detects connected serial devices and searches for an attached arduino     
 ports = list(serial.tools.list_ports.comports())
@@ -66,19 +65,21 @@ for p in ports:
 if _FOUND != False:
     _S_PORT = serial.serial_for_url(_ARDUINO[0], baudrate=_ATTRIBUTE_LIST['ArduinoBaudrate'], timeout=0)
     sio = io.TextIOWrapper(io.BufferedRWPair(_S_PORT, _S_PORT))
-    Time = time.default_timer()
-    ProblemTime = time.default_timer()
+    Time = timeit.default_timer()
+    ProblemTime = timeit.default_timer()
 
 toggle = 0
-StatsHeaders = {"Device": _ATTRIBUTE_LIST["DeviceUUID"]}
+StatsHeaders = {"_Device": _ATTRIBUTE_LIST["DeviceUUID"]}
 url = _ATTRIBUTE_LIST["Domain"] + "api/DeviceData/UpdateDeviceStats"
+Interval = int(_ATTRIBUTE_LIST["PollInterval"])
+Inactivity_Length = int(_ATTRIBUTE_LIST["ArduinoInactivityLength"])
 while True:
     files = ""
     if(toggle == 0):
         jsonFile = open("Stats1.json", "r+")
         lines = jsonFile.read().split('\n')
         hap = ""
-        print(lines)
+        #print(lines)
         for x in lines:
             hap+=x
         jsonFile.close()
@@ -86,17 +87,18 @@ while True:
         
         jsonFile = open("Stats1.json", "w+")
         bob = json.loads(hap)
+        bob["state"]["flags"]["Arduino"] = _FOUND
         bob["state"]["flags"]["FeedError"] = _PROBLEM_DETECTED
         bob = json.dumps(bob)
         jsonFile.write(bob);
         jsonFile.close()
-        files = {'StatsFile' : ('Stats.json', open("Stats1.json", 'rb')), '_Device': _ATTRIBUTE_LIST["DeviceUUID"]}
+        files = {'StatsFile' : ('Stats.json', open("Stats1.json", 'rb'))}
         toggle = 1
     else:
         jsonFile = open("Stats2.json", "r+")
         lines = jsonFile.read().split('\n')
         hap = ""
-        print(lines)
+        #print(lines)
         for x in lines:
             hap+=x
         jsonFile.close()
@@ -104,11 +106,12 @@ while True:
         
         jsonFile = open("Stats2.json", "w+")
         bob = json.loads(hap)
+        bob["state"]["flags"]["Arduino"] = _FOUND
         bob["state"]["flags"]["FeedError"] = _PROBLEM_DETECTED
         bob = json.dumps(bob)
         jsonFile.write(bob);
         jsonFile.close()
-        files = {'StatsFile' : ('Stats.json', open("Stats2.json", 'rb')), '_Device': _ATTRIBUTE_LIST["DeviceUUID"]}
+        files = {'StatsFile' : ('Stats.json', open("Stats2.json", 'rb'))}
         toggle = 0
 
     if _FOUND != False:
@@ -124,4 +127,7 @@ while True:
             _PROBLEM_DETECTED = True
     
     r = requests.post(url, files=files, headers = StatsHeaders)
-    UUID = resp.text
+    UUID = r.text
+    print(UUID)
+    print(r.status_code)
+    time.sleep(Interval)

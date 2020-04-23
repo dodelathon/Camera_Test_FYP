@@ -52,7 +52,7 @@ if os.path.exists(_SETTING_FILE_PATH):
                     kv = x.split("; ")
                     _ATTRIBUTE_LIST[kv[0]] = kv[1]
                     print(kv[0] + " : " + kv[1])
-            lines.close()
+
 
 #This portion detects connected serial devices and searches for an attached arduino     
 ports = list(serial.tools.list_ports.comports())
@@ -66,15 +66,15 @@ for p in ports:
 if _FOUND != False:
     _S_PORT = serial.serial_for_url(_ARDUINO[0], baudrate=_ATTRIBUTE_LIST['ArduinoBaudrate'], timeout=0)
     sio = io.TextIOWrapper(io.BufferedRWPair(_S_PORT, _S_PORT))
-    Time = time.default_timer()
-    ProblemTime = time.default_timer()
+    Time = timeit.default_timer()
+    ProblemTime = timeit.default_timer()
 
 OctoAPI = _ATTRIBUTE_LIST["OctoPiAddress"]
 OctoHeaders = {'X-Api-Key': _ATTRIBUTE_LIST["OctoPiKey"]}
 StatsAPI = _ATTRIBUTE_LIST["Domain"] + "api/DeviceData/UpdateDeviceStats"
 StatsHeaders = {"Device": _ATTRIBUTE_LIST["DeviceUUID"]}
-Interval = _ATTRIBUTE_LIST["PollInterval"]
-Inactivity_Length = _ATTRIBUTE_LIST["ArduinoInactivityLength"]
+Interval = int(_ATTRIBUTE_LIST["PollInterval"])
+Inactivity_Length = int(_ATTRIBUTE_LIST["ArduinoInactivityLength"])
 
 #The main funtionality of this script is here. 
 def main():
@@ -134,7 +134,7 @@ def main():
         
         #Attempts to send Stats file to the server.
         try:
-            files = {'StatsFile' : ('Stats.json', open("Stats.json", 'rb')), '_Device': _ATTRIBUTE_LIST["DeviceUUID"]}
+            files = {'StatsFile' : ('Stats.json', open("Stats.json", 'rb'))}
             r = requests.post(url, files=files, headers = StatsHeaders)
         except:
             print("There was an error updating the Statistics on the Server!\nIs it offline?")
