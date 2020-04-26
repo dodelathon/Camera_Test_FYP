@@ -1,6 +1,5 @@
 #Imports
 import math
-import cv2
 import requests
 import sys
 import io
@@ -10,6 +9,7 @@ import os
 import timeit
 import json
 import time
+from pathlib import Path
 
 #Initialization of Global Variables
 _OPERATING_SYSTEM = None
@@ -38,7 +38,7 @@ else:
         print("Exiting...")
 
 if _OPERATING_SYSTEM == 1:
-     _SETTING_FILE_PATH = "~/Camera_Script_Setup/"
+     _SETTING_FILE_PATH = str(Path.home()) + "/Camera_Script_Setup/"
 elif _OPERATING_SYSTEM == 2:
      _SETTING_FILE_PATH = "C:\\Camera_Script_Setup\\"
 
@@ -56,7 +56,7 @@ if os.path.exists(_SETTING_FILE_PATH):
 #This portion detects connected serial devices and searches for an attached arduino     
 ports = list(serial.tools.list_ports.comports())
 for p in ports:
-    if "Arduino" in p[1]:
+    if "Arduino" in p[1] or "ACM" in p[1]:
         _ARDUINO = p
         _FOUND = True
         print("Arduino Found, using the first!")

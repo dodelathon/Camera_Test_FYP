@@ -1,6 +1,5 @@
 #Imports
 import math
-import cv2
 import requests
 import sys
 import io
@@ -10,6 +9,8 @@ import os
 import timeit
 import json
 import time
+from pathlib import Path
+from datetime import datetime
 
 #Initialization of Global Variables
 _OPERATING_SYSTEM = None
@@ -38,7 +39,7 @@ else:
         print("Exiting...")
 
 if _OPERATING_SYSTEM == 1:
-     _SETTING_FILE_PATH = "~/Camera_Script_Setup/"
+     _SETTING_FILE_PATH = str(Path.home()) + "/Camera_Script_Setup/"
 elif _OPERATING_SYSTEM == 2:
      _SETTING_FILE_PATH = "C:\\Camera_Script_Setup\\"
 
@@ -57,7 +58,7 @@ if os.path.exists(_SETTING_FILE_PATH):
 #This portion detects connected serial devices and searches for an attached arduino     
 ports = list(serial.tools.list_ports.comports())
 for p in ports:
-    if "Arduino" in p[1]:
+    if "Arduino" in p[1] or "ACM" in p[1]:
         _ARDUINO = p
         _FOUND = True
         print("Arduino Found, using the first!")
@@ -72,28 +73,33 @@ if _FOUND != False:
 OctoAPI = _ATTRIBUTE_LIST["OctoPiAddress"]
 OctoHeaders = {'X-Api-Key': _ATTRIBUTE_LIST["OctoPiKey"]}
 StatsAPI = _ATTRIBUTE_LIST["Domain"] + "api/DeviceData/UpdateDeviceStats"
-StatsHeaders = {"Device": _ATTRIBUTE_LIST["DeviceUUID"]}
+StatsHeaders = {"_Device": _ATTRIBUTE_LIST["DeviceUUID"]}
 Interval = int(_ATTRIBUTE_LIST["PollInterval"])
 Inactivity_Length = int(_ATTRIBUTE_LIST["ArduinoInactivityLength"])
 
 #The main funtionality of this script is here. 
 def main():
-    stop = false
-    while stop == false:
+    stop = False
+    while stop == False:
 
         #This section polls the Octoprint instance connected to the printer (Script will likely be on the same Raspberry PI)
+        now = datetime.now()
+        dt_string = now.strftime("%d/%m/%Y %H:%M:%S")
+        	
         resp = ""
         jsonFile = open("Stats.json", "w+")
         try:
             resp = requests.get(OctoAPI + "api/printer", headers = OctoHeaders)
             if(resp.status_code == 409):
-                jsonFile.write("{ \"state\" : \"" + resp.text + "\"}")
+                jsonFile.write("{ \"state\" : \"" + resp.text + "\",")
+                jsonFile.write("\"LastUpdate\" : \"" + dt_string + "\"}")
             else:
                 resp = json.loads(resp.text)
                 #If the Arduino is detected, will test if any feed issues have been detected
                 if _FOUND == True:
                     resp["state"]["flags"]["ArduinoFound"] = _FOUND
                     resp["state"]["flags"]["FeedError"] = _PROBLEM_DETECTED
+                    resp["state"]["flags"]["LastUpdate"] = dt_string
                     stop = _PROBLEM_DETECTED
                     #Tells the printer to pause the job if the a problem is detected
                     if _PROBLEM_DETECTED == True:
@@ -105,13 +111,15 @@ def main():
 
                 else:
                     resp["state"]["flags"]["ArduinoFound"] = _FOUND
+                    resp["state"]["flags"]["Time"] = dt_string
                 
                 jsonFile.write(json.dumps(resp))
         
         except:
             #Pauses script if there's an issue communicating to Octoprint
             if jsonFile.closed() == False:
-                jsonFile.write("{\"Status\" : \"There was an issue sending the request, Octoprint may be offline!\"}")
+                jsonFile.write("{\"Status\" : \"There was an issue sending the request, Octoprint may be offline!\",")
+                jsonFile.write("\"Time\" : \"" + dt_string + "\"}")
                 jsonFile.close()
             print("There was an issue sending the request,\nOctoprint may be offline!")
             stop = True
@@ -135,7 +143,9 @@ def main():
         #Attempts to send Stats file to the server.
         try:
             files = {'StatsFile' : ('Stats.json', open("Stats.json", 'rb'))}
-            r = requests.post(url, files=files, headers = StatsHeaders)
+            r = requests.post(StatsAPI, files=files, headers = StatsHeaders)
+            print(r.status_code)
+            print(r.text)
         except:
             print("There was an error updating the Statistics on the Server!\nIs it offline?")
         time.sleep(Interval)

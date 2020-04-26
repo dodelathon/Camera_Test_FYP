@@ -4,6 +4,7 @@ import requests
 import sys
 import os
 import time
+from pathlib import Path
 
 # Declaration of Global Variables
 
@@ -21,7 +22,7 @@ elif sys.platform.startswith('win32'):
     _OPERATING_SYSTEM = 2
 
 if _OPERATING_SYSTEM == 1 or _OPERATING_SYSTEM == 0 :
-     _SETTING_FILE_PATH = "~/Camera_Script_Setup/"
+     _SETTING_FILE_PATH = str(Path.home()) + "/Camera_Script_Setup/"
 elif _OPERATING_SYSTEM == 2:
      _SETTING_FILE_PATH = "C:\\Camera_Script_Setup\\"
 
@@ -45,21 +46,19 @@ else:
 
 # Sets the API upload URL, Utilizes OpenCV to connect to the camera and sends a frame every 5 seconds to the server.
 url = _ATTRIBUTE_LIST["Domain"] + _API_PATH
-print(url)
 cap = cv2.VideoCapture(0)
 Interval = int(_ATTRIBUTE_LIST["ImageInterval"])
 header = {'_Device':_ATTRIBUTE_LIST["DeviceUUID"]}
 
 try:
     while(cap.isOpened()):
-        frameId = cap.get(1)
         ret, frame = cap.read()
         if (ret != True):
             break
 
-        print(_ATTRIBUTE_LIST["DeviceUUID"])
         time.sleep(Interval)
         filename = _ATTRIBUTE_LIST["ImagePath"] + "image.jpg"   
+        filename = filename.strip()
         cv2.imwrite(filename, frame)
         file = {'photo' : ('image.jpg', open(filename, 'rb'))}
         r = requests.post(url, files=file, headers=header)

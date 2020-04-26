@@ -3,6 +3,7 @@ import os
 import platform
 import requests
 import traceback
+from pathlib import Path
 
 _OPERATING_SYSTEM = 0
 _SETTING_FILE_PATH = ""
@@ -93,7 +94,7 @@ try:
 
         #Sets the Setup File Location based on which OS is Detected 
         if _OPERATING_SYSTEM == 1:
-            _SETTING_FILE_PATH = "~/Camera_Script_Setup/"
+            _SETTING_FILE_PATH = str(Path.home()) + "/Camera_Script_Setup/"
         elif _OPERATING_SYSTEM == 2:
             _SETTING_FILE_PATH = "C:\\Camera_Script_Setup\\"
     
