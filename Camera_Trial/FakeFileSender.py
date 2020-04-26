@@ -73,7 +73,12 @@ StatsHeaders = {"_Device": _ATTRIBUTE_LIST["DeviceUUID"]}
 url = _ATTRIBUTE_LIST["Domain"] + "api/DeviceData/UpdateDeviceStats"
 Interval = int(_ATTRIBUTE_LIST["PollInterval"])
 Inactivity_Length = int(_ATTRIBUTE_LIST["ArduinoInactivityLength"])
+OctoAPI = _ATTRIBUTE_LIST["OctoPiAddress"]
+OctoHeaders = {'X-Api-Key': _ATTRIBUTE_LIST["OctoPiKey"]}
 while True:
+    jobResp = requests.get(OctoAPI + "api/job", headers = OctoHeaders)    
+    jobResp = json.loads(jobResp.text)
+
     files = ""
     if(toggle == 0):
         jsonFile = open("Stats1.json", "r+")
@@ -89,6 +94,12 @@ while True:
         bob = json.loads(hap)
         bob["state"]["flags"]["Arduino"] = _FOUND
         bob["state"]["flags"]["FeedError"] = _PROBLEM_DETECTED
+        for key1, value1 in jobResp.items():
+            if not key1 == "state":
+                bob[key1] = value1
+          
+
+
         bob = json.dumps(bob)
         jsonFile.write(bob);
         jsonFile.close()
@@ -108,6 +119,10 @@ while True:
         bob = json.loads(hap)
         bob["state"]["flags"]["Arduino"] = _FOUND
         bob["state"]["flags"]["FeedError"] = _PROBLEM_DETECTED
+        for key1, value1 in jobResp.items():
+           if not key1 == "state":
+                bob[key1] = value1
+
         bob = json.dumps(bob)
         jsonFile.write(bob);
         jsonFile.close()

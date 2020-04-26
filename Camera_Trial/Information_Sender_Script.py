@@ -21,6 +21,7 @@ _ARDUINO = None
 _S_PORT = None
 _FOUND = False
 _PROBLEM_DETECTED = False
+_JOB = False
 Time = 0
 ProblemTime = 0
 
@@ -95,6 +96,10 @@ def main():
                 jsonFile.write("\"LastUpdate\" : \"" + dt_string + "\"}")
             else:
                 resp = json.loads(resp.text)
+                jobResp = requests.get(OctoAPI + "api/job", headers = OctoHeaders)    
+                jobResp = json.loads(jobResp.text)
+                if jobResp["job"]["estimatedPrintTime"] is not None:
+                    _JOB = True
                 #If the Arduino is detected, will test if any feed issues have been detected
                 if _FOUND == True:
                     resp["state"]["flags"]["ArduinoFound"] = _FOUND
@@ -113,6 +118,10 @@ def main():
                     resp["state"]["flags"]["ArduinoFound"] = _FOUND
                     resp["state"]["flags"]["Time"] = dt_string
                 
+                for key1, value1 in jobResp.items():
+                    if not key1 == "state":
+                        resp[key1] = value1
+                
                 jsonFile.write(json.dumps(resp))
         
         except:
@@ -125,9 +134,7 @@ def main():
             stop = True
 
         #Checks to see if there is an active job, this stops the script from pausing if theres no movement on the Arduino due to no active job 
-        resp = requests.get(OctoAPI + "api/job", headers = OctoHeaders)    
-        resp = json.loads(resp.text)
-        if resp["job"]["estimatedPrintTime"] is not None:
+        if _JOB == True:
             #This section only activates if an arduino is connected. It checks to see if the rotory encoder in the head has moved. If not, signals there's been a problem with the print
             if _FOUND != False:
                 sio.flush()
